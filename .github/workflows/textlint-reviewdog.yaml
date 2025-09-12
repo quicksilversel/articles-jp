@@ -1,0 +1,49 @@
+name: "textlint & reviewdog"
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - "articles/*.md"
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - "articles/*.md"
+  workflow_dispatch:
+
+env:
+  REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Setup nodejs"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          
+      - name: "Setup reviewdog"
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: "Install node dependencies"
+        run: npm ci
+
+      - name: "textlint and reviewdog"
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md | \
+          reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-review -level=warning -fail-on-error=false
+
+      - name: "textlint check only"
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          npx textlint --ignore-path .textlintignore -c .textlintrc articles/*.md
