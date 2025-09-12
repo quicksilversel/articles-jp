@@ -1,0 +1,89 @@
+name: "textlint & reviewdog"
+
+on:
+  push:
+    branches:
+      - main
+    paths: 
+      - "articles/*.md"
+  pull_request:
+    branches:
+      - main
+    paths: 
+      - "articles/*.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        
+      - name: Generate GitHub App Token
+        id: generate-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: "Setup nodejs"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          
+      - name: "Setup reviewdog"
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: "Install node dependencies"
+        run: npm ci
+
+      - name: "Get changed files"
+        id: changed-files
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: tj-actions/changed-files@v42
+        with:
+          files: "articles/**/*.md"
+
+      - name: "textlint and reviewdog"
+        id: textlint-check
+        if: ${{ github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true' }}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        run: |
+          set +e
+          echo "=== Running textlint on changed files ==="
+          echo "$CHANGED_FILES"
+          
+          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle $CHANGED_FILES > textlint-output.xml 2>&1
+          TEXTLINT_EXIT_CODE=$?
+          
+          # Check if the output contains any error elements
+          if grep -q '<error' textlint-output.xml; then
+            echo "has_errors=true" >> $GITHUB_OUTPUT
+            echo "Textlint found issues"
+            cat textlint-output.xml | reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-review -level=warning -fail-on-error=false
+          else
+            echo "has_errors=false" >> $GITHUB_OUTPUT
+            echo "No textlint issues found"
+          fi
+          
+      - name: "Auto approve if no issues"
+        if: ${{ github.event_name == 'pull_request' && steps.textlint-check.outputs.has_errors == 'false' }}
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          gh pr review "${{ github.event.number }}" --approve --body "✅ No textlint issues found. Auto-approving!"
+
+      - name: "textlint check only"
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          npx textlint --ignore-path .textlintignore -c .textlintrc articles/*.md

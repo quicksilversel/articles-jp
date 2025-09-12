@@ -1,0 +1,31 @@
+{
+  "rules": {
+    "preset-ja-technical-writing": {
+      "sentence-length": {
+        "max": 100
+      },
+      "max-comma": {
+        "max": 3
+      },
+      "max-ten": {
+        "max": 3
+      },
+      "max-kanji-continuous-len": {
+        "max": 6
+      },
+      "arabic-kanji-numbers": true,
+      "no-hankaku-kana": true,
+      "ja-no-weak-phrase": true,
+      "ja-no-redundant-expression": true,
+      "ja-no-abusage": true,
+      "ja-no-successive-word": true,
+      "ja-unnatural-alphabet": true,
+      "no-mixed-zenkaku-and-hankaku-alphabet": true
+    },
+    "ja-technical-writing/no-exclamation-question-mark": false,
+    "ja-technical-writing/sentence-length": false
+  },
+  "filters": {
+    "comments": true
+  }
+}

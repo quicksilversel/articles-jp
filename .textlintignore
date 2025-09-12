@@ -1,0 +1,5 @@
+node_modules/
+.git/
+public/
+*.min.js
+*.bundle.js

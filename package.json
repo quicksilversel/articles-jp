@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "textlint articles/*.md -c .textlintrc",
+    "lint:fix": "textlint articles/*.md -c .textlintrc --fix"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +15,10 @@
     "zenn-cli": "^0.2.1"
   },
   "devDependencies": {
-    "@qiita/qiita-cli": "^1.6.2"
+    "@qiita/qiita-cli": "^1.6.2",
+    "textlint": "^14.0.0",
+    "textlint-rule-preset-ja-technical-writing": "^10.0.1",
+    "textlint-rule-preset-ja-spacing": "^2.4.3",
+    "textlint-filter-rule-comments": "^1.2.2"
   }
 }
