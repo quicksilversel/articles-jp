@@ -14,7 +14,7 @@ jobs:
   auto-approve:
     runs-on: ubuntu-latest
     # Only run if PR is from the qiita-post-articles branch
-    if: github.head_ref == 'qiita-post-articles'
+    if: github.head_ref == 'test-branch3'
     
     steps:
       - name: Checkout code
@@ -22,10 +22,10 @@ jobs:
       
       - name: Generate GitHub App Token
         id: generate-token
-        uses: tibdex/github-app-token@v2
+        uses: actions/create-github-app-token@v1
         with:
-          app_id: ${{ secrets.APP_ID }}
-          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       
       - name: Auto approve PR
         env:
