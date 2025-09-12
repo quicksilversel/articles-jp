@@ -1,12 +1,12 @@
 ---
 title: AWS ALBのdeletion_protectionにハマった話
 tags:
-  - "aws"
-  - "kubernetes"
-  - "sre"
+  - AWS
+  - kubernetes
+  - SRE
 private: false
-updated_at: ""
-id: null
+updated_at: '2025-08-25T09:40:01+09:00'
+id: 409ebadb50fd8a25f12d
 organization_url_name: null
 slide: false
 ignorePublish: false
