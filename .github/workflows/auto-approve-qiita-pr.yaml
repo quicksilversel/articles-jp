@@ -4,13 +4,13 @@ on:
   pull_request:
     types: [opened, reopened, synchronize]
     branches:
-      - test-branch
+      - main
 
 jobs:
   auto-approve:
     runs-on: ubuntu-latest
     # Only run if PR is from the qiita-post-articles branch
-    if: github.head_ref == 'qiita-post-articles'
+    if: github.head_ref == 'test-branch'
     
     steps:
       - name: Generate GitHub App Token
