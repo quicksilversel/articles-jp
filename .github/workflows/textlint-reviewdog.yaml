@@ -6,15 +6,16 @@ on:
       - main
     paths: 
       - "articles/*.md"
-  pull_request:
+  pull_request_target:
     branches:
       - main
     paths: 
       - "articles/*.md"
   workflow_dispatch:
 
-env:
-  REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
   linter:
@@ -22,6 +23,13 @@ jobs:
     steps:
       - name: "Checkout"
         uses: actions/checkout@v4
+        
+      - name: Generate GitHub App Token
+        id: generate-token
+        uses: tibdex/github-app-token@v2
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: "Setup nodejs"
         uses: actions/setup-node@v4
@@ -38,7 +46,9 @@ jobs:
         run: npm ci
 
       - name: "textlint and reviewdog"
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md | \
           reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-review -level=warning -fail-on-error=false
