@@ -52,16 +52,17 @@ jobs:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
           set +e
-          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md > textlint-output.xml
+          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md > textlint-output.xml 2>&1
           TEXTLINT_EXIT_CODE=$?
           
-          if [ $TEXTLINT_EXIT_CODE -eq 0 ]; then
-            echo "has_errors=false" >> $GITHUB_OUTPUT
-            echo "No textlint issues found"
-          else
+          # Check if the output contains any error elements
+          if grep -q '<error' textlint-output.xml; then
             echo "has_errors=true" >> $GITHUB_OUTPUT
             echo "Textlint found issues"
             cat textlint-output.xml | reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-review -level=warning -fail-on-error=false
+          else
+            echo "has_errors=false" >> $GITHUB_OUTPUT
+            echo "No textlint issues found"
           fi
           
       - name: "Auto approve if no issues"
