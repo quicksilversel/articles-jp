@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "textlint articles/*.md -c config/.textlintrc",
-    "lint:fix": "textlint articles/*.md -c config/.textlintrc --fix"
+    "lint": "textlint articles/*.md -c .textlintrc",
+    "lint:fix": "textlint articles/*.md -c .textlintrc --fix"
   },
   "keywords": [],
   "author": "",
