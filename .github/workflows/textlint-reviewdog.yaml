@@ -45,14 +45,25 @@ jobs:
       - name: "Install node dependencies"
         run: npm ci
 
+      - name: "Get changed files"
+        id: changed-files
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: tj-actions/changed-files@v42
+        with:
+          files: "articles/**/*.md"
+
       - name: "textlint and reviewdog"
         id: textlint-check
-        if: ${{ github.event_name == 'pull_request' }}
+        if: ${{ github.event_name == 'pull_request' && steps.changed-files.outputs.any_changed == 'true' }}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
         run: |
           set +e
-          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md > textlint-output.xml 2>&1
+          echo "=== Running textlint on changed files ==="
+          echo "$CHANGED_FILES"
+          
+          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle $CHANGED_FILES > textlint-output.xml 2>&1
           TEXTLINT_EXIT_CODE=$?
           
           # Check if the output contains any error elements
