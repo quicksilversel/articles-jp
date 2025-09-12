@@ -13,7 +13,7 @@ published: true
 
 ## 1. DatadogでALBの5xxを見るならelb_5xxを使う
 
-なぜ`target_5xx`が今回のケースでは向かなかったのか
+なぜ`target_5xx`が今回のケースでは向かなかったのか。
 
 `aws.applicationelb.httpcode_target_5xx`自体が悪いわけではありません。
 ただ、私たちの環境ではアプリ側に別途モニターがあり、同じ障害で二重アラートになるという課題がありました。

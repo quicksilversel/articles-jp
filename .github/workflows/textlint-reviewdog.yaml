@@ -46,12 +46,30 @@ jobs:
         run: npm ci
 
       - name: "textlint and reviewdog"
+        id: textlint-check
         if: ${{ github.event_name == 'pull_request' }}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md | \
-          reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-review -level=warning -fail-on-error=false
+          set +e
+          npx textlint --ignore-path .textlintignore -c .textlintrc -f checkstyle articles/*.md > textlint-output.xml
+          TEXTLINT_EXIT_CODE=$?
+          
+          if [ $TEXTLINT_EXIT_CODE -eq 0 ]; then
+            echo "has_errors=false" >> $GITHUB_OUTPUT
+            echo "No textlint issues found"
+          else
+            echo "has_errors=true" >> $GITHUB_OUTPUT
+            echo "Textlint found issues"
+            cat textlint-output.xml | reviewdog -f=checkstyle -name="textlint" -reporter=github-pr-review -level=warning -fail-on-error=false
+          fi
+          
+      - name: "Auto approve if no issues"
+        if: ${{ github.event_name == 'pull_request' && steps.textlint-check.outputs.has_errors == 'false' }}
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          gh pr review "${{ github.event.number }}" --approve --body "✅ No textlint issues found. Auto-approving!"
 
       - name: "textlint check only"
         if: ${{ github.event_name != 'pull_request' }}
