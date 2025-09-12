@@ -6,7 +6,7 @@ on:
       - main
     paths: 
       - "articles/*.md"
-  pull_request_target:
+  pull_request:
     branches:
       - main
     paths: 
@@ -46,7 +46,7 @@ jobs:
         run: npm ci
 
       - name: "textlint and reviewdog"
-        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+        if: ${{ github.event_name == 'pull_request' }}
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
