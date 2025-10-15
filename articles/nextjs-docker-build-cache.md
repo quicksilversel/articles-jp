@@ -227,7 +227,7 @@ key: ${{ runner.os }}-nextjs-docker-${{ hashFiles('**/package-lock.json') }} # �
 | **ビルド時間** | 25分 | 13分 | **48%削減** |
 | **キャッシュサイズ** | 0 GB（毎回ゼロから） | 約2GB（再利用） | - |
 
-![nextjs-docker-build-cache-result.png](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/3617150/b024dfe6-5caa-423b-bc3a-db851c35c027.png)
+![](/images/nextjs-docker-build-cache-result.png)
 
 PRを出してから結果が返ってくるまでの時間が半分になり、開発速度が大幅に向上しました。
 
