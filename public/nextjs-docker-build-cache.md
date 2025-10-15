@@ -1,13 +1,13 @@
 ---
 title: Next.jsのDockerビルドを25分→13分に高速化した話【GitHub Actions】
 tags:
-  - "nextjs"
-  - "docker"
-  - "githubactions"
-  - "ci"
+  - CI
+  - Docker
+  - Next.js
+  - GitHubActions
 private: false
-updated_at: ""
-id: null
+updated_at: '2025-10-15T09:48:02+09:00'
+id: 6001428f4847e565b25f
 organization_url_name: null
 slide: false
 ignorePublish: false
